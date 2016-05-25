@@ -5,6 +5,12 @@
  */
 package camomile.client.java;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import jdk.nashorn.internal.ir.debug.JSONWriter;
+import model.Login;
+import model.User;
+
 /**
  *
  * @author mathias
@@ -14,25 +20,18 @@ public class main {
     /**
      * @param args the command line arguments
      */
-    
     //localhost:3000
-    
     public static void clear() {
-        for (int i=0; i<4; i++) {
+        for (int i = 0; i < 4; i++) {
             System.out.println("");
         }
     }
-    
+
     public static void main(String[] args) {
         CamomileClientJava camomile = new CamomileClientJava();
-        
-        camomile.login();
+        camomile.login(new Login("root", "admin"));
         camomile.getMe();
-        clear();
-        
-        //camomile.createCorpus("corpus1", "universalos");
-        
-        camomile.getAllCorpus();
+        camomile.logout();
     }
-    
+
 }

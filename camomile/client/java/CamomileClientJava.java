@@ -5,6 +5,8 @@
  */
 package camomile.client.java;
 
+import connection.Get;
+import connection.Post;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -19,6 +21,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jdk.nashorn.internal.parser.JSONParser;
+import model.Corpora;
+import model.Login;
+import model.User;
+import org.json.JSONObject;
 
 /**
  *
@@ -47,41 +53,52 @@ public class CamomileClientJava {
     /////////////////////////////////
     //          Authentication
     /////////////////////////////////
-    public String login() {
-        String resp = sendPost("/login", "username=" + USERNAME + "&password=" + PASSWORD);
+    public void login(Login login) {
+        Post post = new Post("/login", login.toArgs());
+        post.execute();
 
-        Map<String, List<String>> headerFields = this.connection.getHeaderFields();
+        Map<String, List<String>> headerFields = post.getConnection().getHeaderFields();
         if (headerFields.containsKey(SET_COOKIE)) {
             List<String> cookieValues = headerFields.get(SET_COOKIE);
             for (String cookieH : cookieValues) {
                 cookie = HttpCookie.parse(cookieH).get(0);
+                post.setCookie(cookie);
             }
             System.out.println("Cookies added : " + cookie.getValue());
         }
-        return resp;
+
+        //ERROR HANDLER
     }
 
-    public String logout() {
-        return sendPost("/logout");
+    public void logout() {
+        new Post("/logout").execute();
     }
 
-    public String getMe() {
-        return sendGet("/me");
+    public User getMe() {
+        return new User(new Get("/me").execute());
     }
 
     /////////////////////////////////
     //            Users
     /////////////////////////////////
-    public String createUser(String username, String password, String description, String role) {
-        String argsPost = "username=" + username
-                + "&password=" + password
-                + "&description=" + description
-                + "&role=" + role;
-        return sendPost("/user", argsPost);
+    public void createUser(User user) throws CamomileClientException {
+        /*String argsPost = "username=" + user.getName() + "&password=" + user.getPassword()
+                + "&description=" + user.getDescription().toString() + "&role=" + user.getRole();
+        JSONObject jso = sendPost("/user", argsPost);*/
+
+        JSONObject jso = sendPost("/user", user.toArgs());
+        if (jso.get("error") != null) {
+            throw new CamomileClientException((String) jso.get("error"));
+        }
+        user.setId(jso.getString("_id"));
     }
 
     public String deleteUser(String id) {
         return sendDelete("/user/" + id);
+    }
+
+    public String deleteUser(User user) {
+        return sendDelete("/user/" + user.getId());
     }
 
     public String getAllUser() {
@@ -92,19 +109,23 @@ public class CamomileClientJava {
         return sendGet("/user/" + id);
     }
 
-    public String updateUser(String id, String description) {
-        return sendPut("/user/" + id, "description=" + description);
+    public String updateUser(User user) {
+        return sendPut("/user/" + user.getId(), "description=" + user.getDescription());
     }
 
     /////////////////////////////////
     //            Corpora
     /////////////////////////////////
-    public String createCorpus(String name, String licence) {
-        return sendPost("/corpus", "name=" + name + "&description={'license':" + licence + "}");
+    public String createCorpus(Corpora copora) {
+        return sendPost("/corpus", "name=" + copora.getName() + "&description=" + copora.getDescription().toString());
     }
 
     public String deleteCorpus(String id) {
         return sendDelete("/corpus/" + id);
+    }
+
+    public String deleteCorpus(Corpora copora) {
+        return sendDelete("/corpus/" + copora.getId());
     }
 
     public String getAllCorpus() {
@@ -194,7 +215,7 @@ public class CamomileClientJava {
     ///////////////////
     //      POST
     ///////////////////
-    private String sendPost(String action, String arg) {
+    private JSONObject sendPost(String action, String arg) {
         try {
             String adr = address + action;
             url = new URL(adr);
@@ -206,15 +227,17 @@ public class CamomileClientJava {
             if (cookie != null) {
                 connection.setRequestProperty(COOKIE_REQ_PROP, "camomile.sid=" + cookie.getValue());
             }
+
+            connection.setRequestProperty("Content-Type", "application/json");
 
             DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
             wr.writeBytes(arg);
             wr.flush();
             //wr.close();
 
-            System.out.println(">>> Sending request : " + connection.toString());
+            System.out.println(">>> Sending request : " + connection.toString() + "\n\tPOST : " + arg);
 
-              //Méthode pour récupérer le code de la réponse du serveur
+            //Méthode pour récupérer le code de la réponse du serveur
             getRespCode();
 
             //Méthode pour récupérer la réponse du serveur
@@ -222,10 +245,10 @@ public class CamomileClientJava {
         } catch (Exception ex) {
             Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "error";
+        return new JSONObject("{\"error\":\"deuxieme return\"}");
     }
 
-    private String sendPost(String action) {
+    private JSONObject sendPost(String action) {
         try {
             String adr = address + action;
             url = new URL(adr);
@@ -240,7 +263,7 @@ public class CamomileClientJava {
 
             System.out.println(">>> Sending request : " + connection.toString());
 
-             //Méthode pour récupérer le code de la réponse du serveur
+            //Méthode pour récupérer le code de la réponse du serveur
             getRespCode();
 
             //Méthode pour récupérer la réponse du serveur
@@ -248,13 +271,13 @@ public class CamomileClientJava {
         } catch (Exception ex) {
             Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "error";
+        return new JSONObject("{\"error\":\"deuxieme return\"}");
     }
 
     ///////////////////
     //      GET
     ///////////////////
-    private String sendGet(String action) {
+    private JSONObject sendGet(String action) {
         try {
             String adr = address + action;
             url = new URL(adr);
@@ -267,7 +290,7 @@ public class CamomileClientJava {
             }
 
             System.out.println(">>> Sending request : " + connection.toString());
-            
+
             //Méthode pour récupérer le code de la réponse du serveur
             getRespCode();
 
@@ -276,13 +299,13 @@ public class CamomileClientJava {
         } catch (Exception ex) {
             Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "error";
+        return new JSONObject("{\"error\":\"deuxieme return\"}");
     }
 
     ///////////////////
     //      DELETE
     ///////////////////
-    private String sendDelete(String target) {
+    private JSONObject sendDelete(String target) {
         try {
             String adr = address + target;
             url = new URL(adr);
@@ -304,13 +327,13 @@ public class CamomileClientJava {
         } catch (Exception ex) {
             Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "error";
+        return new JSONObject("{\"error\":\"deuxieme return\"}");
     }
 
     ///////////////////
     //      PUT
     ///////////////////
-    private String sendPut(String action, String arg) {
+    private JSONObject sendPut(String action, String arg) {
         try {
             String adr = address + action;
             url = new URL(adr);
@@ -338,7 +361,7 @@ public class CamomileClientJava {
         } catch (Exception ex) {
             Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return "error";
+        return new JSONObject("{\"error\":\"deuxieme return\"}");
     }
 
     ///////////////////
@@ -346,18 +369,18 @@ public class CamomileClientJava {
     ///////////////////
     private int getRespCode() throws Exception {
         int responseCode = connection.getResponseCode();
-        
+
         if (responseCode < 200 || responseCode > 300) {
             System.err.println(responseCode + " : " + connection.getResponseMessage());
             throw new Exception("ResponseCodeError");
         }
-        
+
         System.out.println(">> Response Code : " + responseCode);
-        
+
         return responseCode;
     }
 
-    private String getResp() throws IOException {
+    private JSONObject getResp() throws IOException {
         BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String inputLine;
         StringBuilder response = new StringBuilder();
@@ -369,6 +392,15 @@ public class CamomileClientJava {
 
         System.out.println(">> Response : " + response.toString());
 
-        return response.toString();
+        JSONObject ret = new JSONObject(response.toString());
+        return ret;
+    }
+
+    public class CamomileClientException extends Exception {
+
+        public CamomileClientException(String message) {
+            super(message);
+        }
+
     }
 }

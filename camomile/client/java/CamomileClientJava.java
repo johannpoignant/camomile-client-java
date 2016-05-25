@@ -5,8 +5,10 @@
  */
 package camomile.client.java;
 
+import connection.Delete;
 import connection.Get;
 import connection.Post;
+import connection.Put;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -23,10 +25,13 @@ import java.util.logging.Logger;
 import jdk.nashorn.internal.parser.JSONParser;
 import model.Corpora;
 import model.Login;
+import model.Media;
 import model.User;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
+ *
  *
  * @author mathias
  */
@@ -53,9 +58,9 @@ public class CamomileClientJava {
     /////////////////////////////////
     //          Authentication
     /////////////////////////////////
-    public void login(Login login) {
+    public boolean login(Login login) {
         Post post = new Post("/login", login.toArgs());
-        post.execute();
+        JSONObject jso = post.execute();
 
         Map<String, List<String>> headerFields = post.getConnection().getHeaderFields();
         if (headerFields.containsKey(SET_COOKIE)) {
@@ -68,10 +73,11 @@ public class CamomileClientJava {
         }
 
         //ERROR HANDLER
+        return jso.get("success") != null;
     }
 
-    public void logout() {
-        new Post("/logout").execute();
+    public boolean logout() {
+        return new Post("/logout").execute().get("success") != null;
     }
 
     public User getMe() {
@@ -81,7 +87,7 @@ public class CamomileClientJava {
     /////////////////////////////////
     //            Users
     /////////////////////////////////
-    public void createUser(User user) throws CamomileClientException {
+    public User createUser(User user) throws CamomileClientException {
         /*String argsPost = "username=" + user.getName() + "&password=" + user.getPassword()
                 + "&description=" + user.getDescription().toString() + "&role=" + user.getRole();
         JSONObject jso = sendPost("/user", argsPost);*/
@@ -91,68 +97,103 @@ public class CamomileClientJava {
             throw new CamomileClientException((String) jso.get("error"));
         }
         user.setId(jso.getString("_id"));
+
+        return new User(jso);
     }
 
-    public String deleteUser(String id) {
-        return sendDelete("/user/" + id);
+    public boolean deleteUser(String id) {
+        return new Delete("/user", id).execute().get("success") != null;
     }
 
-    public String deleteUser(User user) {
-        return sendDelete("/user/" + user.getId());
+    public boolean deleteUser(User user) {
+        return new Delete("/user", user.getId()).execute().get("success") != null;
     }
 
-    public String getAllUser() {
-        return sendGet("/user");
+    public ArrayList<User> getAllUsers() {
+        ArrayList<User> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/user").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new User(jsa.getJSONObject(i)));
+        }
+
+        return ret;
     }
 
-    public String getUser(String id) {
-        return sendGet("/user/" + id);
+    public User getUser(String id) {
+        return new User(new Get("/user/" + id).execute());
     }
 
-    public String updateUser(User user) {
-        return sendPut("/user/" + user.getId(), "description=" + user.getDescription());
+    public User updateUser(User user) {
+        return new User(new Put("/user", user.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Corpora
     /////////////////////////////////
-    public String createCorpus(Corpora copora) {
-        return sendPost("/corpus", "name=" + copora.getName() + "&description=" + copora.getDescription().toString());
+    public Corpora createCorpus(Corpora corpora) {
+        return new Corpora(new Post("/corpus", corpora.toArgs()).execute());
     }
 
-    public String deleteCorpus(String id) {
-        return sendDelete("/corpus/" + id);
+    public boolean deleteCorpus(String id) {
+        return new Delete("/corpus", id).execute().get("success") != null;
     }
 
-    public String deleteCorpus(Corpora copora) {
-        return sendDelete("/corpus/" + copora.getId());
+    public boolean deleteCorpus(Corpora corpora) {
+        return new Delete("/corpus", corpora.getId()).execute().get("success") != null;
     }
 
-    public String getAllCorpus() {
-        return sendGet("/corpus");
+    public ArrayList<Corpora> getAllCorpus() {
+        ArrayList<Corpora> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/corpus").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Corpora(jsa.getJSONObject(i)));
+        }
+        return ret;
     }
 
-    public String getCorpus(String id) {
-        return sendGet("/corpus/" + id);
+    public Corpora getCorpus(String id) {
+        return new Corpora(new Get("/corpus", id).execute());
     }
 
-    public String updateCorpus(String id, String name, String licence) {
-        return sendPut("/corpus/" + id, "name=" + name + "&description={'license':" + licence + "}"); //ordre changer, voir doc
+    public Corpora updateCorpus(Corpora corpora) {
+        return new Corpora(new Put("/corpus", corpora.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Media
     /////////////////////////////////
-    public String createMedia(String name, String idCorpus) {
-        return sendPost("/corpus/" + idCorpus + "/medium", "name=" + name);
+    public Media createMedia(Media media, Corpora corpora) {
+        return new Media(new Post("/corpus/" + corpora.getId() + "/medium", media.toArgs()).execute());
     }
 
-    public String deleteMedia(String idMedia) {
-        return sendDelete("/medium/" + idMedia);
+    public Media createMedia(Media media, String idCorpora) {
+        return new Media(new Post("/corpus/" + idCorpora + "/medium", media.toArgs()).execute());
     }
 
-    public String getAllMedia() {
-        return sendGet("/medium");
+    public boolean deleteMedia(String idMedia) {
+        return new Delete("/medium", idMedia).execute().get("success") != null;
+    }
+
+    public boolean deleteMedia(Media media) {
+        return new Delete("/medium", media.getId()).execute().get("success") != null;
+    }
+
+    public ArrayList<Media> getAllMedia() {
+        ArrayList<Media> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/media").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Media(jsa.getJSONObject(i)));
+        }
+        return ret;
+    }
+
+    public ArrayList<Media> getAllMedia(Corpora corpora) {
+        ArrayList<Media> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/media/"+corpora.getId()+"/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Media(jsa.getJSONObject(i)));
+        }
+        return ret;
     }
 
     public String getMedia(String idMedia) {

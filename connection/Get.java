@@ -10,6 +10,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -31,7 +32,7 @@ public class Get extends Http {
     @Override
     public JSONObject execute() {
         try {
-            initConnection();
+            requestServer();
 
             System.out.println(">>> Sending request : " + connection.toString());
 
@@ -44,6 +45,7 @@ public class Get extends Http {
             Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
         }
         return new JSONObject("{\"error\":\"deuxieme return\"}");
-    }
+    }    
+    
 
 }

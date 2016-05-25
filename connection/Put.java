@@ -32,7 +32,7 @@ public class Put extends Http {
     @Override
     public JSONObject execute() {
         try {
-            initConnection();
+            requestServer();
 
             DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
             wr.writeBytes(args);

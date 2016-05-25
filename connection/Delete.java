@@ -18,15 +18,15 @@ import org.json.JSONObject;
  */
 public class Delete extends Http {
 
-    public Delete(String action, String target) {
-        super(action + "/" + target);
+    public Delete(String action, String targetId) {
+        super(action + "/" + targetId);
         this.requestMethod = "GET";
     }
 
     @Override
     public JSONObject execute() {
         try {
-            initConnection();
+            requestServer();
 
             System.out.println(">>> Sending request : " + connection.toString());
 

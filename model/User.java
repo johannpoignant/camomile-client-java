@@ -12,7 +12,7 @@ import org.json.JSONObject;
  *
  * @author mathias
  */
-public class User {
+public class User extends Resource {
 
     private String id;
     private String username;
@@ -41,11 +41,6 @@ public class User {
             this.description = jso.getJSONObject("description");
         } catch (JSONException e) {
         }
-    }
-
-    public String toArgs() {
-        JSONObject jso = new JSONObject(this);
-        return jso.toString();
     }
 
     public String getUsername() {

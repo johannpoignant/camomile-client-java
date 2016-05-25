@@ -32,7 +32,8 @@ public class Post extends Http {
     @Override
     public JSONObject execute() {
         try {
-            initConnection();
+            //Méthode pour créer la connection
+            requestServer();
 
             connection.setDoOutput(true);
             DataOutputStream wr = new DataOutputStream(connection.getOutputStream());

@@ -13,6 +13,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -48,7 +50,23 @@ public abstract class Http {
         this.cookie = cookie;
     }
 
-    protected void initConnection() throws MalformedURLException, ProtocolException, IOException {
+    /*
+    public JSONObject execute() throws MalformedURLException, ProtocolException, IOException {
+        url = new URL(SERVER_ADDRESS + action);
+        connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod(this.requestMethod);
+
+        if (cookie != null) {
+            connection.setRequestProperty(COOKIE_REQ_PROP, "camomile.sid=" + cookie.getValue());
+        }
+
+        connection.setRequestProperty("Content-Type", "application/json");
+        
+        
+    }
+     */
+    protected void requestServer() throws MalformedURLException, ProtocolException, IOException {
         url = new URL(SERVER_ADDRESS + action);
         connection = (HttpURLConnection) url.openConnection();
 
@@ -86,7 +104,14 @@ public abstract class Http {
 
         System.out.println("\t> Response : " + response.toString());
 
-        JSONObject ret = new JSONObject(response.toString());
+        JSONObject ret;
+        try {//Si le JSON est un tableau on le transforme en simple object
+            ret = new JSONObject(response.toString());
+        } catch (JSONException e) { 
+            JSONArray jsa = new JSONArray(response.toString());
+            ret = new JSONObject().append("array", jsa);
+        }
+
         return ret;
     }
 

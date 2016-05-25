@@ -5,10 +5,76 @@
  */
 package model;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  *
  * @author mathias
  */
-public class Media {
-    
+public class Media extends Resource {
+
+    private String id;
+    private String name;
+    private String url;
+    private JSONObject description;
+
+    public Media(String name) {
+        this.name = name;
+    }
+
+    public Media(String name, String url) {
+        this.name = name;
+        this.url = url;
+    }
+
+    public Media(String name, JSONObject description) {
+        this.name = name;
+        this.description = description;
+    }
+
+    public Media(String name, String url, JSONObject description) {
+        this.name = name;
+        this.url = url;
+        this.description = description;
+    }
+
+    public Media(JSONObject jso) {
+        this.id = jso.getString("_id");
+        this.name = jso.getString("name");
+        this.url = jso.getString("url");
+        try {
+            this.description = jso.getJSONObject("description");
+        } catch (JSONException e) {
+        }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public JSONObject getDescription() {
+        return description;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setDescription(JSONObject description) {
+        this.description = description;
+    }
+
 }

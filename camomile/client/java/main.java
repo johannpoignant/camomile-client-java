@@ -8,6 +8,7 @@ package camomile.client.java;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jdk.nashorn.internal.ir.debug.JSONWriter;
+import model.Corpora;
 import model.Login;
 import model.User;
 
@@ -29,8 +30,14 @@ public class main {
 
     public static void main(String[] args) {
         CamomileClientJava camomile = new CamomileClientJava();
+        Corpora c = new Corpora("corpora:1");
+
         camomile.login(new Login("root", "admin"));
-        camomile.getMe();
+        
+        
+        camomile.createCorpus(c);
+        
+        
         camomile.logout();
     }
 

@@ -17,7 +17,7 @@ import org.json.JSONObject;
  *
  * @author mathias
  */
-public class Post extends Http {
+public class Post extends Args {
 
     public Post(String action, String args) {
         super(action, args);
@@ -28,30 +28,5 @@ public class Post extends Http {
         super(action);
         this.requestMethod = "POST";
         }
-
-    @Override
-    public JSONObject execute() {
-        try {
-            //Méthode pour créer la connection
-            requestServer();
-
-            connection.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(args);
-            wr.flush();
-            //wr.close();
-
-            System.out.println(">>> Sending request : " + connection.toString() + "\n\tPOST : " + args);
-
-            //Méthode pour récupérer le code de la réponse du serveur
-            getRespCode();
-
-            //Méthode pour récupérer la réponse du serveur
-            return getResp();
-        } catch (Exception ex) {
-            Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return new JSONObject("{\"error\":\"deuxieme return\"}");
-    }
 
 }

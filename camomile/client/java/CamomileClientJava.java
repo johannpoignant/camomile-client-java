@@ -60,7 +60,7 @@ public class CamomileClientJava {
     /////////////////////////////////
     //          Authentication
     /////////////////////////////////
-    public boolean login(Login login) {
+    public boolean login(Login login) throws Exception {
         Post post = new Post("/login", login.toArgs());
         JSONObject jso = post.execute();
 
@@ -74,22 +74,21 @@ public class CamomileClientJava {
             System.out.println("Cookies added : " + cookie.getValue());
         }
 
-        //ERROR HANDLER
-        return jso.get("success") != null;
+        return jso.isNull("error");
     }
 
-    public boolean logout() {
-        return new Post("/logout").execute().get("success") != null;
+    public boolean logout() throws Exception {
+        return new Post("/logout").execute().isNull("success");
     }
 
-    public User getMe() {
+    public User getMe() throws Exception{
         return new User(new Get("/me").execute());
     }
 
     /////////////////////////////////
     //            Users
     /////////////////////////////////
-    public User createUser(User user) throws CamomileClientException {
+    public User createUser(User user) throws Exception {
         /*String argsPost = "username=" + user.getName() + "&password=" + user.getPassword()
                 + "&description=" + user.getDescription().toString() + "&role=" + user.getRole();
         JSONObject jso = sendPost("/user", argsPost);*/
@@ -103,15 +102,15 @@ public class CamomileClientJava {
         return new User(jso);
     }
 
-    public boolean deleteUser(String id) {
-        return new Delete("/user", id).execute().get("success") != null;
+    public boolean deleteUser(String id)throws Exception {
+        return new Delete("/user", id).execute().isNull("success");
     }
 
-    public boolean deleteUser(User user) {
-        return new Delete("/user", user.getId()).execute().get("success") != null;
+    public boolean deleteUser(User user)throws Exception {
+        return new Delete("/user", user.getId()).execute().isNull("success");
     }
 
-    public ArrayList<User> getAllUsers() {
+    public ArrayList<User> getAllUsers()throws Exception {
         ArrayList<User> ret = new ArrayList<>();
         JSONArray jsa = new Get("/user").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -121,30 +120,30 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public User getUser(String id) {
+    public User getUser(String id) throws Exception{
         return new User(new Get("/user/" + id).execute());
     }
 
-    public User updateUser(User user) {
+    public User updateUser(User user)throws Exception {
         return new User(new Put("/user", user.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Corpora
     /////////////////////////////////
-    public Corpora createCorpus(Corpora corpora) {
+    public Corpora createCorpus(Corpora corpora) throws Exception{
         return new Corpora(new Post("/corpus", corpora.toArgs()).execute());
     }
 
-    public boolean deleteCorpus(String id) {
-        return new Delete("/corpus", id).execute().get("success") != null;
+    public boolean deleteCorpus(String id) throws Exception{
+        return new Delete("/corpus", id).execute().isNull("success");
     }
 
-    public boolean deleteCorpus(Corpora corpora) {
-        return new Delete("/corpus", corpora.getId()).execute().get("success") != null;
+    public boolean deleteCorpus(Corpora corpora)throws Exception {
+        return new Delete("/corpus", corpora.getId()).execute().isNull("success");
     }
 
-    public ArrayList<Corpora> getAllCorpus() {
+    public ArrayList<Corpora> getAllCorpus()throws Exception {
         ArrayList<Corpora> ret = new ArrayList<>();
         JSONArray jsa = new Get("/corpus").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -153,41 +152,41 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public Corpora getCorpus(String id) {
+    public Corpora getCorpus(String id)throws Exception {
         return new Corpora(new Get("/corpus", id).execute());
     }
 
-    public Corpora updateCorpus(Corpora corpora) {
+    public Corpora updateCorpus(Corpora corpora)throws Exception {
         return new Corpora(new Put("/corpus", corpora.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Media
     /////////////////////////////////
-    public Media createMedia(Media media, Corpora corpora) {
+    public Media createMedia(Media media, Corpora corpora)throws Exception {
         return new Media(new Post("/corpus/" + corpora.getId() + "/medium", media.toArgs()).execute());
     }
 
-    public Media createMedia(Media media, String idCorpora) {
+    public Media createMedia(Media media, String idCorpora)throws Exception {
         return new Media(new Post("/corpus/" + idCorpora + "/medium", media.toArgs()).execute());
     }
 
-    public Media createMedia(Media media) throws CamomileClientException {
+    public Media createMedia(Media media) throws Exception {
         if (media.getIdCorpus().isEmpty()) {
             throw new CamomileClientException("Ce Media ne dispose pas d'id_corpus");
         }
         return new Media(new Post("/corpus/" + media.getIdCorpus() + "/medium", media.toArgs()).execute());
     }
 
-    public boolean deleteMedia(String idMedia) {
-        return new Delete("/medium", idMedia).execute().get("success") != null;
+    public boolean deleteMedia(String idMedia)throws Exception {
+        return new Delete("/medium", idMedia).execute().isNull("success");
     }
 
-    public boolean deleteMedia(Media media) {
-        return new Delete("/medium", media.getId()).execute().get("success") != null;
+    public boolean deleteMedia(Media media) throws Exception{
+        return new Delete("/medium", media.getId()).execute().isNull("success");
     }
 
-    public ArrayList<Media> getAllMedia() {
+    public ArrayList<Media> getAllMedia()throws Exception {
         ArrayList<Media> ret = new ArrayList<>();
         JSONArray jsa = new Get("/media").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -196,7 +195,7 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public ArrayList<Media> getAllMediaFromCorpora(Corpora corpora) {
+    public ArrayList<Media> getAllMediaFromCorpora(Corpora corpora) throws Exception{
         ArrayList<Media> ret = new ArrayList<>();
         JSONArray jsa = new Get("/media/" + corpora.getId() + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -205,7 +204,7 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public ArrayList<Media> getAllMediaFromIdCorpora(String idCorpora) {
+    public ArrayList<Media> getAllMediaFromIdCorpora(String idCorpora) throws Exception{
         ArrayList<Media> ret = new ArrayList<>();
         JSONArray jsa = new Get("/media/" + idCorpora + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -214,34 +213,34 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public Media getMedia(String idMedia) {
+    public Media getMedia(String idMedia)throws Exception {
         return new Media(new Get("/medium/" + idMedia).execute());
     }
 
-    public Media updateMedia(Media media) {
+    public Media updateMedia(Media media)throws Exception {
         return new Media(new Put("/medium/" + media.getId(), media.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Layers
     /////////////////////////////////
-    public Layer createLayer(Layer layer) {
+    public Layer createLayer(Layer layer)throws Exception {
         return new Layer(new Post("/corpus/" + layer.getIdCorpus() + "/layer", layer.toArgs()).execute());
     }
 
-    public Layer createLayer(Layer layer, String idCorpus) {
+    public Layer createLayer(Layer layer, String idCorpus) throws Exception{
         return new Layer(new Post("/corpus/" + idCorpus + "/layer", layer.toArgs()).execute());
     }
 
-    public Layer createLayer(Layer layer, Corpora corpora) {
+    public Layer createLayer(Layer layer, Corpora corpora) throws Exception{
         return new Layer(new Post("/corpus/" + corpora.getId() + "/layer", layer.toArgs()).execute());
     }
 
-    public boolean deleteLayer(String idLayer) {
-        return new Delete("/layer", idLayer).execute().get("success") != null;
+    public boolean deleteLayer(String idLayer) throws Exception{
+        return new Delete("/layer", idLayer).execute().isNull("success");
     }
 
-    public ArrayList<Layer> getAllLayer() {
+    public ArrayList<Layer> getAllLayer() throws Exception{
         ArrayList<Layer> ret = new ArrayList<>();
         JSONArray jsa = new Get("/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -250,7 +249,7 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public ArrayList<Layer> getAllLayerFromCorpus(Corpora corpora) {
+    public ArrayList<Layer> getAllLayerFromCorpus(Corpora corpora) throws Exception{
         ArrayList<Layer> ret = new ArrayList<>();
         JSONArray jsa = new Get("/layer/" + corpora.getId() + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -259,7 +258,7 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public ArrayList<Layer> getAllLayerFromIdCorpus(String idCorpus) {
+    public ArrayList<Layer> getAllLayerFromIdCorpus(String idCorpus) throws Exception{
         ArrayList<Layer> ret = new ArrayList<>();
         JSONArray jsa = new Get("/layer/" + idCorpus + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -268,22 +267,22 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public Layer updateLayer(Layer layer) {
+    public Layer updateLayer(Layer layer) throws Exception{
         return new Layer(new Post("/layer/"+layer.getId(), layer.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Annotation
     /////////////////////////////////
-    public Annotation createAnnotation(Annotation annotation) {
+    public Annotation createAnnotation(Annotation annotation)throws Exception {
         return new Annotation(new Post("Layer/" + annotation.getIdLayer() + "/annotation", annotation.toArgs()).execute());
     }
 
-    public boolean deleteAnnotation(String idAnnotation) {
-        return new Delete("/annotation", idAnnotation).execute().getString("success") != null;
+    public boolean deleteAnnotation(String idAnnotation) throws Exception{
+        return new Delete("/annotation", idAnnotation).execute().isNull("success");
     }
 
-    public ArrayList<Annotation> getAllAnnotation() {
+    public ArrayList<Annotation> getAllAnnotation() throws Exception{
         ArrayList<Annotation> ret = new ArrayList<>();
         JSONArray jsa = new Get("/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -292,7 +291,7 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public ArrayList<Annotation> getAllAnnotationFromLayer(Layer layer) {
+    public ArrayList<Annotation> getAllAnnotationFromLayer(Layer layer) throws Exception{
         ArrayList<Annotation> ret = new ArrayList<>();
         JSONArray jsa = new Get("/annotation/" + layer.getId() + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -301,7 +300,7 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public ArrayList<Annotation> getAllAnnotationFromidLayer(String idLayer) {
+    public ArrayList<Annotation> getAllAnnotationFromidLayer(String idLayer)throws Exception {
         ArrayList<Annotation> ret = new ArrayList<>();
         JSONArray jsa = new Get("/annotation/" + idLayer + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
@@ -310,22 +309,12 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public Annotation getAnnotation(String idAnnotation) {
+    public Annotation getAnnotation(String idAnnotation)throws Exception {
         return new Annotation(new Get("/annotation/" + idAnnotation).execute());
     }
 
-    public Annotation updateAnnotation(Annotation annotation) {
+    public Annotation updateAnnotation(Annotation annotation) throws Exception{
         return new Annotation(new Put("/annotation/" + annotation.getId(), annotation.toArgs()).execute());
     }
 
-    //////////////////////
-    //      Exception
-    //////////////////////
-    public class CamomileClientException extends Exception {
-
-        public CamomileClientException(String message) {
-            super(message);
-        }
-
-    }
 }

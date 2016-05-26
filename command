@@ -19,6 +19,6 @@ POST/user username=_________&password=___________&description=_________&role=___
 
 
 
-	POST : username=user2&password=123456789&description={}&role=user
+	POST : {"username":"root","password":"admin"}
 
 	POST : {"password":"123456789","role":"user","name":"user2","description":{}}

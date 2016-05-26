@@ -29,16 +29,24 @@ public class main {
     }
 
     public static void main(String[] args) {
-        CamomileClientJava camomile = new CamomileClientJava();
-        Corpora c = new Corpora("corpora:1");
-
-        camomile.login(new Login("root", "admin"));
-        
-        
-        camomile.createCorpus(c);
-        
-        
-        camomile.logout();
+        try {
+            CamomileClientJava camomile = new CamomileClientJava();
+            Corpora c = new Corpora("corpora2");
+            User u = new User("user11", "123456789", "user");
+            
+            camomile.login(new Login("root", "admin"));
+            
+            camomile.getAllUsers();
+            
+            camomile.createUser(u);
+            
+            camomile.createCorpus(c);
+            
+            
+            camomile.logout();
+        } catch (Exception ex) {
+            System.err.println("\t" + ex.getMessage());
+        }
     }
 
 }

@@ -23,6 +23,11 @@ public class Delete extends Http {
         this.requestMethod = "GET";
     }
 
+    public Delete(String action) {
+        super(action);
+        this.requestMethod = "GET";
+    }
+
     @Override
     public JSONObject execute() {
         try {

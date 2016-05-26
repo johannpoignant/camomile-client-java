@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jdk.nashorn.internal.parser.JSONParser;
+import model.Annotation;
 import model.Corpora;
+import model.Layer;
 import model.Login;
 import model.Media;
 import model.User;
@@ -92,7 +94,7 @@ public class CamomileClientJava {
                 + "&description=" + user.getDescription().toString() + "&role=" + user.getRole();
         JSONObject jso = sendPost("/user", argsPost);*/
 
-        JSONObject jso = sendPost("/user", user.toArgs());
+        JSONObject jso = new Post("/user", user.toArgs()).execute();
         if (jso.get("error") != null) {
             throw new CamomileClientException((String) jso.get("error"));
         }
@@ -170,6 +172,13 @@ public class CamomileClientJava {
         return new Media(new Post("/corpus/" + idCorpora + "/medium", media.toArgs()).execute());
     }
 
+    public Media createMedia(Media media) throws CamomileClientException {
+        if (media.getIdCorpus().isEmpty()) {
+            throw new CamomileClientException("Ce Media ne dispose pas d'id_corpus");
+        }
+        return new Media(new Post("/corpus/" + media.getIdCorpus() + "/medium", media.toArgs()).execute());
+    }
+
     public boolean deleteMedia(String idMedia) {
         return new Delete("/medium", idMedia).execute().get("success") != null;
     }
@@ -187,256 +196,131 @@ public class CamomileClientJava {
         return ret;
     }
 
-    public ArrayList<Media> getAllMedia(Corpora corpora) {
+    public ArrayList<Media> getAllMediaFromCorpora(Corpora corpora) {
         ArrayList<Media> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/media/"+corpora.getId()+"/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/media/" + corpora.getId() + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Media(jsa.getJSONObject(i)));
         }
         return ret;
     }
 
-    public String getMedia(String idMedia) {
-        return sendGet("/medium/" + idMedia);
+    public ArrayList<Media> getAllMediaFromIdCorpora(String idCorpora) {
+        ArrayList<Media> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/media/" + idCorpora + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Media(jsa.getJSONObject(i)));
+        }
+        return ret;
     }
 
-    public String updateMedia(String idMedia, String description) {
-        return sendPut("/medium/" + idMedia, "description=" + description);
+    public Media getMedia(String idMedia) {
+        return new Media(new Get("/medium/" + idMedia).execute());
+    }
+
+    public Media updateMedia(Media media) {
+        return new Media(new Put("/medium/" + media.getId(), media.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Layers
     /////////////////////////////////
-    public String createLayer(String name, String idCorpus) {
-        return sendPost("/corpus/" + idCorpus + "/layer", "name=" + name);
+    public Layer createLayer(Layer layer) {
+        return new Layer(new Post("/corpus/" + layer.getIdCorpus() + "/layer", layer.toArgs()).execute());
     }
 
-    public String deleteLayer(String idLayer) {
-        return sendDelete("/layer/" + idLayer);
+    public Layer createLayer(Layer layer, String idCorpus) {
+        return new Layer(new Post("/corpus/" + idCorpus + "/layer", layer.toArgs()).execute());
     }
 
-    public String getAllLayer() {
-        return sendGet("/layer");
+    public Layer createLayer(Layer layer, Corpora corpora) {
+        return new Layer(new Post("/corpus/" + corpora.getId() + "/layer", layer.toArgs()).execute());
     }
 
-    public String getLayer(String idLayer) {
-        return sendGet("/layer/" + idLayer);
+    public boolean deleteLayer(String idLayer) {
+        return new Delete("/layer", idLayer).execute().get("success") != null;
     }
 
-    public String updateLayer(String idLayer, String description) {
-        return sendPut("/layer/" + idLayer, "description=" + description);
+    public ArrayList<Layer> getAllLayer() {
+        ArrayList<Layer> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Layer(jsa.getJSONObject(i)));
+        }
+        return ret;
+    }
+
+    public ArrayList<Layer> getAllLayerFromCorpus(Corpora corpora) {
+        ArrayList<Layer> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/layer/" + corpora.getId() + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Layer(jsa.getJSONObject(i)));
+        }
+        return ret;
+    }
+
+    public ArrayList<Layer> getAllLayerFromIdCorpus(String idCorpus) {
+        ArrayList<Layer> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/layer/" + idCorpus + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Layer(jsa.getJSONObject(i)));
+        }
+        return ret;
+    }
+
+    public Layer updateLayer(Layer layer) {
+        return new Layer(new Post("/layer/"+layer.getId(), layer.toArgs()).execute());
     }
 
     /////////////////////////////////
     //            Annotation
     /////////////////////////////////
-    public String createAnnotation(String idLayer, String idMedium, String fragment, String data) {
-        return sendPost("/layer/" + idLayer + "/annotation", "id_medium=" + idMedium + "&fragment=" + fragment + "&data=" + data);
+    public Annotation createAnnotation(Annotation annotation) {
+        return new Annotation(new Post("Layer/" + annotation.getIdLayer() + "/annotation", annotation.toArgs()).execute());
     }
 
-    public String deleteAnnotation(String idAnnotation) {
-        return sendDelete("/annotation/" + idAnnotation);
+    public boolean deleteAnnotation(String idAnnotation) {
+        return new Delete("/annotation", idAnnotation).execute().getString("success") != null;
     }
 
-    public String getAllAnnotation() {
-        return sendGet("/annotation");
-    }
-
-    public String getAnnotation(String idAnnotation) {
-        return sendGet("/annotation/" + idAnnotation);
-    }
-
-    public String updateAnnotation(String idAnnotation, String fragment, String data) {
-        return sendPut("/annotation/" + idAnnotation, "fragment=" + fragment + "&data=" + data);
-    }
-
-    /////////////////////////////////
-    //            HTTP
-    /////////////////////////////////
-    ///////////////////
-    //      POST
-    ///////////////////
-    private JSONObject sendPost(String action, String arg) {
-        try {
-            String adr = address + action;
-            url = new URL(adr);
-            connection = (HttpURLConnection) url.openConnection();
-
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-
-            if (cookie != null) {
-                connection.setRequestProperty(COOKIE_REQ_PROP, "camomile.sid=" + cookie.getValue());
-            }
-
-            connection.setRequestProperty("Content-Type", "application/json");
-
-            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(arg);
-            wr.flush();
-            //wr.close();
-
-            System.out.println(">>> Sending request : " + connection.toString() + "\n\tPOST : " + arg);
-
-            //Méthode pour récupérer le code de la réponse du serveur
-            getRespCode();
-
-            //Méthode pour récupérer la réponse du serveur
-            return getResp();
-        } catch (Exception ex) {
-            Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
+    public ArrayList<Annotation> getAllAnnotation() {
+        ArrayList<Annotation> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Annotation(jsa.getJSONObject(i)));
         }
-        return new JSONObject("{\"error\":\"deuxieme return\"}");
-    }
-
-    private JSONObject sendPost(String action) {
-        try {
-            String adr = address + action;
-            url = new URL(adr);
-            connection = (HttpURLConnection) url.openConnection();
-
-            connection.setDoOutput(true);
-            connection.setRequestMethod("POST");
-
-            if (cookie != null) {
-                connection.setRequestProperty(COOKIE_REQ_PROP, "camomile.sid=" + cookie.getValue());
-            }
-
-            System.out.println(">>> Sending request : " + connection.toString());
-
-            //Méthode pour récupérer le code de la réponse du serveur
-            getRespCode();
-
-            //Méthode pour récupérer la réponse du serveur
-            return getResp();
-        } catch (Exception ex) {
-            Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return new JSONObject("{\"error\":\"deuxieme return\"}");
-    }
-
-    ///////////////////
-    //      GET
-    ///////////////////
-    private JSONObject sendGet(String action) {
-        try {
-            String adr = address + action;
-            url = new URL(adr);
-            connection = (HttpURLConnection) url.openConnection();
-
-            connection.setRequestMethod("GET");
-
-            if (cookie != null) {
-                connection.setRequestProperty(COOKIE_REQ_PROP, "camomile.sid=" + cookie.getValue());
-            }
-
-            System.out.println(">>> Sending request : " + connection.toString());
-
-            //Méthode pour récupérer le code de la réponse du serveur
-            getRespCode();
-
-            //Méthode pour récupérer la réponse du serveur
-            return getResp();
-        } catch (Exception ex) {
-            Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return new JSONObject("{\"error\":\"deuxieme return\"}");
-    }
-
-    ///////////////////
-    //      DELETE
-    ///////////////////
-    private JSONObject sendDelete(String target) {
-        try {
-            String adr = address + target;
-            url = new URL(adr);
-            connection = (HttpURLConnection) url.openConnection();
-
-            connection.setRequestMethod("DELETE");
-
-            if (cookie != null) {
-                connection.setRequestProperty(COOKIE_REQ_PROP, "camomile.sid=" + cookie.getValue());
-            }
-
-            System.out.println(">>> Sending request : " + connection.toString());
-
-            //Méthode pour récupérer le code de la réponse du serveur
-            getRespCode();
-
-            //Méthode pour récupérer la réponse du serveur
-            return getResp();
-        } catch (Exception ex) {
-            Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return new JSONObject("{\"error\":\"deuxieme return\"}");
-    }
-
-    ///////////////////
-    //      PUT
-    ///////////////////
-    private JSONObject sendPut(String action, String arg) {
-        try {
-            String adr = address + action;
-            url = new URL(adr);
-            connection = (HttpURLConnection) url.openConnection();
-
-            connection.setDoOutput(true);
-            connection.setRequestMethod("PUT");
-
-            if (cookie != null) {
-                connection.setRequestProperty(COOKIE_REQ_PROP, "camomile.sid=" + cookie.getValue());
-            }
-
-            DataOutputStream wr = new DataOutputStream(connection.getOutputStream());
-            wr.writeBytes(arg);
-            wr.flush();
-            //wr.close();
-
-            System.out.println(">>> Sending request : " + connection.toString());
-
-            //Méthode pour récupérer le code de la réponse du serveur
-            getRespCode();
-
-            //Méthode pour récupérer la réponse du serveur
-            return getResp();
-        } catch (Exception ex) {
-            Logger.getLogger(CamomileClientJava.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return new JSONObject("{\"error\":\"deuxieme return\"}");
-    }
-
-    ///////////////////
-    //      META
-    ///////////////////
-    private int getRespCode() throws Exception {
-        int responseCode = connection.getResponseCode();
-
-        if (responseCode < 200 || responseCode > 300) {
-            System.err.println(responseCode + " : " + connection.getResponseMessage());
-            throw new Exception("ResponseCodeError");
-        }
-
-        System.out.println(">> Response Code : " + responseCode);
-
-        return responseCode;
-    }
-
-    private JSONObject getResp() throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
-        System.out.println(">> Response : " + response.toString());
-
-        JSONObject ret = new JSONObject(response.toString());
         return ret;
     }
 
+    public ArrayList<Annotation> getAllAnnotationFromLayer(Layer layer) {
+        ArrayList<Annotation> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/annotation/" + layer.getId() + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Annotation(jsa.getJSONObject(i)));
+        }
+        return ret;
+    }
+
+    public ArrayList<Annotation> getAllAnnotationFromidLayer(String idLayer) {
+        ArrayList<Annotation> ret = new ArrayList<>();
+        JSONArray jsa = new Get("/annotation/" + idLayer + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        for (int i = 0; i < jsa.length(); i++) {
+            ret.add(new Annotation(jsa.getJSONObject(i)));
+        }
+        return ret;
+    }
+
+    public Annotation getAnnotation(String idAnnotation) {
+        return new Annotation(new Get("/annotation/" + idAnnotation).execute());
+    }
+
+    public Annotation updateAnnotation(Annotation annotation) {
+        return new Annotation(new Put("/annotation/" + annotation.getId(), annotation.toArgs()).execute());
+    }
+
+    //////////////////////
+    //      Exception
+    //////////////////////
     public class CamomileClientException extends Exception {
 
         public CamomileClientException(String message) {

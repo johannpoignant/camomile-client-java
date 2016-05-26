@@ -15,12 +15,26 @@ import org.json.JSONObject;
 public class Media extends Resource {
 
     private String id;
+    private String idCorpus;
     private String name;
     private String url;
     private JSONObject description;
 
     public Media(String name) {
         this.name = name;
+    }
+
+    public Media(String name, String idCorpus, String url) {
+        this.name = name;
+        this.idCorpus = idCorpus;
+        this.url = url;
+    }
+
+    public Media(String name, String idCorpus, String url, JSONObject description) {
+        this.name = name;
+        this.idCorpus = idCorpus;
+        this.url = url;
+        this.description = description;
     }
 
     public Media(String name, String url) {
@@ -43,6 +57,7 @@ public class Media extends Resource {
         this.id = jso.getString("_id");
         this.name = jso.getString("name");
         this.url = jso.getString("url");
+        this.idCorpus = jso.getString("id_corpus");
         try {
             this.description = jso.getJSONObject("description");
         } catch (JSONException e) {
@@ -59,6 +74,10 @@ public class Media extends Resource {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getIdCorpus() {
+        return idCorpus;
     }
 
     public JSONObject getDescription() {

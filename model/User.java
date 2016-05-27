@@ -9,6 +9,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Class User is a Java representation of the corresponding Camomile's object.
+ * it contains :
+ * <ul>
+ * <li> An id corresponding to the Camomile's Annotation attribute _id </li>
+ * <li> An username corresponding to the Camomile's Annotation attribute
+ * username
+ * </li>
+ * <li> A password corresponding to the User's password </li>
+ * <li> An role corresponding to the Camomile's Annotation attribute role
+ * </li>
+ * <li> A description corresponding to the Camomile's Annotation attribute
+ * description </li>
+ * </ul>
  *
  * @author mathias
  */
@@ -33,6 +46,10 @@ public class User extends Resource {
         this.role = role;
     }
 
+    /**
+     * Constructor for User, usually used with a JSON's response of the server
+     * @param jso 
+     */
     public User(JSONObject jso) {
         this.id = jso.getString("_id");
         this.username = jso.getString("username");

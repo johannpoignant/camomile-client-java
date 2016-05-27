@@ -5,28 +5,32 @@
  */
 package connection;
 
-import camomile.client.java.CamomileClientJava;
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.json.JSONObject;
-
 /**
+ * POST request, usually for create
  *
  * @author mathias
  */
 public class Post extends Args {
 
-    public Post(String action, String args) {
-        super(action, args);
+    /**
+     * Post request to the path path with the arguments args
+     *
+     * @param path path to the target insert
+     * @param args args of the insert
+     */
+    public Post(String path, String args) {
+        super(path, args);
         this.requestMethod = "POST";
     }
 
-    public Post(String action) {
-        super(action);
+    /**
+     * Post request to the path path
+     *
+     * @param path path of the command to execute
+     */
+    public Post(String path) {
+        super(path);
         this.requestMethod = "POST";
-        }
+    }
 
 }

@@ -5,27 +5,21 @@
  */
 package connection;
 
-import camomile.client.java.CamomileClientJava;
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.json.JSONObject;
-
 /**
+ * PUT request, usually for update
  *
  * @author mathias
  */
 public class Put extends Args {
 
-    public Put(String action) {
-        super(action);
-        this.requestMethod = "PUT";
-    }
-
-    public Put(String action, String args) {
-        super(action, args);
+    /**
+     * Put requets of the args to the path
+     *
+     * @param path
+     * @param args
+     */
+    public Put(String path, String args) {
+        super(path, args);
         this.requestMethod = "PUT";
     }
 

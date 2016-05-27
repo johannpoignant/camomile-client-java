@@ -22,12 +22,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
+ * Abstract class for all the possible request type 
+ * - GET
+ * - DELETE
+ * - Args : 
+ *      - POST
+ *      - PUT
+ * 
  * @author mathias
  */
 public abstract class Http {
 
-    protected static final String SERVER_ADDRESS = "http://localhost:3000";
+    protected static String SERVER_ADDRESS;
     protected static final String SET_COOKIE = "set-cookie";
     protected static final String COOKIE_REQ_PROP = "Cookie";
     protected static HttpCookie cookie;
@@ -48,7 +54,6 @@ public abstract class Http {
         this.args = args;
     }
 
-    //public abstract JSONObject execute();
     public void setCookie(HttpCookie cookie) {
         this.cookie = cookie;
     }
@@ -133,5 +138,15 @@ public abstract class Http {
     public HttpURLConnection getConnection() {
         return connection;
     }
+
+    public static String getSERVER_ADDRESS() {
+        return SERVER_ADDRESS;
+    }
+
+    public static void setSERVER_ADDRESS(String SERVER_ADDRESS) {
+        Http.SERVER_ADDRESS = SERVER_ADDRESS;
+    }
+    
+    
 
 }

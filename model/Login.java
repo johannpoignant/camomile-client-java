@@ -8,6 +8,11 @@ package model;
 import org.json.JSONObject;
 
 /**
+ * Class Login is use for the CamomileClientJava's method login it contain :
+ * <ul>
+ * <li> An username </li>
+ * <li> A password </li>
+ * </ul>
  *
  * @author mathias
  */
@@ -33,6 +38,5 @@ public class Login {
     public String getPassword() {
         return password;
     }
-    
-    
+
 }

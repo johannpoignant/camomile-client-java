@@ -9,24 +9,39 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Class Corpus is a Java representation of the corresponding Camomile's object.
+ * it contains :
+ * <ul>
+ * <li> An id corresponding to the Camomile's Annotation attribute _id </li>
+ * <li> A name corresponding to the Camomile's Annotation attribute name
+ * </li>
+ * <li> A description corresponding to the Camomile's Annotation attribute
+ * description </li>
+ * </ul>
  *
  * @author mathias
  */
-public class Corpora extends Resource{
+public class Corpus extends Resource {
+
     private String id;
     private String name;
     private JSONObject description;
 
-    public Corpora(String name, JSONObject description) {
+    public Corpus(String name, JSONObject description) {
         this.name = name;
         this.description = description;
     }
 
-    public Corpora(String name) {
+    public Corpus(String name) {
         this.name = name;
     }
-    
-    public Corpora(JSONObject jso) {
+
+    /**
+     * Constructor for User, usually used with a JSON's response of the server
+     *
+     * @param jso
+     */
+    public Corpus(JSONObject jso) {
         this.id = jso.getString("_id");
         this.name = jso.getString("name");
         try {
@@ -54,6 +69,5 @@ public class Corpora extends Resource{
     public void setDescription(JSONObject description) {
         this.description = description;
     }
-    
-    
+
 }

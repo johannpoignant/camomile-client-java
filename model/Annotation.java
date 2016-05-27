@@ -5,9 +5,23 @@
  */
 package model;
 
+import java.util.HashMap;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
+ * Class Annotation is a Java representation of the corresponding Camomile's
+ * object. it contains :
+ * <ul>
+ * <li> An id corresponding to the Camomile's Annotation attribute _id </li>
+ * <li> An idLayer corresponding to the Camomile's Annotation attribute id_Layer
+ * </li>
+ * <li> An idMedium corresponding to the Camomile's Annotation attribute
+ * id_medium </li>
+ * <li> A fragment corresponding to the Camomile's Annotation attribute fragment
+ * </li>
+ * <li> A data corresponding to the Camomile's Annotation attribute data </li>
+ * </ul>
  *
  * @author mathias
  */
@@ -26,6 +40,17 @@ public class Annotation extends Resource {
         this.data = data;
     }
 
+    public Annotation(String idMedium, JSONObject fragment, JSONObject data) {
+        this.idMedium = idMedium;
+        this.fragment = fragment;
+        this.data = data;
+    }
+
+    /**
+     * Constructor for User, usually used with a JSON's response of the server
+     *
+     * @param jso
+     */
     public Annotation(JSONObject jso) {
         this.id = jso.getString("_id");
         this.idLayer = jso.getString("idLayer");
@@ -61,7 +86,5 @@ public class Annotation extends Resource {
     public void setData(JSONObject data) {
         this.data = data;
     }
-    
-    
 
 }

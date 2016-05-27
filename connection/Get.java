@@ -5,27 +5,28 @@
  */
 package connection;
 
-import camomile.client.java.CamomileClientJava;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 /**
- *
+ * GET request, usually for getter
  * @author mathias
  */
 public class Get extends Http {
 
-    public Get(String action) {
-        super(action);
+    /**
+     * Get the object(s) corresponding to the path
+     * @param path String containing the object type and it _id 
+     */
+    public Get(String path) {
+        super(path);
         this.requestMethod = "GET";
     }
 
-    public Get(String action, String args) {
-        super(action + "?" + args);
+    /**
+     * Get the object(s) corresponding to the path + args
+     * @param path
+     * @param args 
+     */
+    public Get(String path, String args) {
+        super(path + "?" + args);
         this.requestMethod = "GET";
     } 
     

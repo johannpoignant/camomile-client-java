@@ -9,6 +9,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
+ * Class Media is a Java representation of the corresponding Camomile's object.
+ * it contains :
+ * <ul>
+ * <li> An id corresponding to the Camomile's Annotation attribute _id </li>
+ * <li> An idCorpus corresponding to the Camomile's Annotation attribute
+ * id_corpus
+ * </li>
+ * <li> A name corresponding to the Camomile's Annotation attribute name </li>
+ * <li> An url corresponding to the Camomile's Annotation attribute url
+ * </li>
+ * <li> A description corresponding to the Camomile's Annotation attribute
+ * description </li>
+ * </ul>
  *
  * @author mathias
  */
@@ -53,6 +66,11 @@ public class Media extends Resource {
         this.description = description;
     }
 
+    /**
+     * Constructor for User, usually used with a JSON's response of the server
+     *
+     * @param jso
+     */
     public Media(JSONObject jso) {
         this.id = jso.getString("_id");
         this.name = jso.getString("name");

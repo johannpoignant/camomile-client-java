@@ -65,6 +65,13 @@ public class Annotation extends Resource {
         this.data = data;
     }
 
+    public Annotation(JSONObject fragment, JSONObject data) {
+        this.fragment = fragment;
+        this.data = data;
+    }
+    
+    
+
     /**
      * Constructor for User, usually used with a JSON's response of the server
      *
@@ -72,8 +79,7 @@ public class Annotation extends Resource {
      */
     public Annotation(JSONObject jso) {
         this.id = jso.getString("_id");
-        this.idLayer = jso.getString("idLayer");
-        this.idMedium = jso.getString("idMedium");
+        this.idLayer = jso.getString("id_layer");
         this.fragment = jso.getJSONObject("fragment");
         this.data = jso.getJSONObject("data");
     }

@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package connection;
 
 import camomile.client.java.CamomileClientException;
@@ -41,13 +40,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Abstract class for all the possible request type 
- * - GET
- * - DELETE
- * - Args : 
- *      - POST
- *      - PUT
- * 
+ * Abstract class for all the possible request type - GET - DELETE - Args : -
+ * POST - PUT
+ *
  * @author mathias
  */
 public abstract class Http {
@@ -97,7 +92,7 @@ public abstract class Http {
 
         connection.setRequestProperty("Content-Type", "application/json");
 
-        System.out.println("\n\n>>> Sending request : " + connection.toString());
+        System.out.println("\n\n>>> Sending request : " + requestMethod + " " + connection.toString());
     }
 
     protected JSONObject responseCodeHandler() throws IOException, CamomileClientException {
@@ -149,9 +144,14 @@ public abstract class Http {
 
         System.out.println("\t> Response : " + response.toString());
 
-        JSONObject ret = new JSONObject(response.toString());
+        JSONObject ret;
+        try {
+            ret = new JSONObject(response.toString());
+        } catch (JSONException e) {
+            ret = new JSONObject("{\"error\":"+"\""+response.toString()+"\"}");
+        }
 
-        throw new CamomileClientException(ret.getString("error"));
+        throw new CamomileClientException(ret.get("error").toString());
     }
 
     public HttpURLConnection getConnection() {
@@ -165,7 +165,5 @@ public abstract class Http {
     public static void setSERVER_ADDRESS(String SERVER_ADDRESS) {
         Http.SERVER_ADDRESS = SERVER_ADDRESS;
     }
-    
-    
 
 }

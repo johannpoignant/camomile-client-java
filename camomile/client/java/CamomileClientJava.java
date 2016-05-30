@@ -20,8 +20,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
-
+ */
 package camomile.client.java;
 
 import connection.Delete;
@@ -48,9 +47,9 @@ import org.json.JSONObject;
  * @author mathias
  */
 public class CamomileClientJava {
-    
+
     private static final String SET_COOKIE = "set-cookie";
-    
+
     private static final String ROOT_USERNAME = "root";
     private static final String ROOT_PASSWORD = "admin";
 
@@ -82,17 +81,17 @@ public class CamomileClientJava {
         Post post = new Post("/login", login.toArgs());
         JSONObject jso = post.execute();
         HttpCookie cookie;
-        
+
         Map<String, List<String>> headerFields = post.getConnection().getHeaderFields();
         if (headerFields.containsKey(SET_COOKIE)) {
             List<String> cookieValues = headerFields.get(SET_COOKIE);
-            
+
             for (String cookieH : cookieValues) {
                 cookie = HttpCookie.parse(cookieH).get(0);
                 post.setCookie(cookie);
             }
         }
-        
+
         return jso.isNull("error");
     }
 
@@ -129,7 +128,7 @@ public class CamomileClientJava {
      * @throws Exception If failed, an exception is throwed with the error
      * message from the server
      */
-    public User createUser(User user) throws Exception {        
+    public User createUser(User user) throws Exception {
         return new User(new Post("/user", user.toArgs()).execute());
     }
 
@@ -173,7 +172,7 @@ public class CamomileClientJava {
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new User(jsa.getJSONObject(i)));
         }
-        
+
         return ret;
     }
 
@@ -198,7 +197,7 @@ public class CamomileClientJava {
      * message from the server
      */
     public User updateUser(User user) throws Exception {
-        return new User(new Put("/user", user.toArgs()).execute());
+        return new User(new Put("/user/" + user.getId(), user.toArgs()).execute());
     }
 
     /////////////////////////////////
@@ -278,7 +277,7 @@ public class CamomileClientJava {
      * message from the server
      */
     public Corpus updateCorpus(Corpus corpus) throws Exception {
-        return new Corpus(new Put("/corpus", corpus.toArgs()).execute());
+        return new Corpus(new Put("/corpus/" + corpus.getId(), corpus.toArgs()).execute());
     }
 
     /////////////////////////////////
@@ -322,7 +321,7 @@ public class CamomileClientJava {
      * the media doesn't have an id_corpus attribute set
      */
     public Media createMedia(Media media) throws Exception {
-        if (media.getIdCorpus().isEmpty()) {
+        if (media.getIdCorpus() == null || media.getIdCorpus().isEmpty()) {
             throw new CamomileClientException("Ce Media ne dispose pas d'id_corpus");
         }
         return new Media(new Post("/corpus/" + media.getIdCorpus() + "/medium", media.toArgs()).execute());
@@ -361,7 +360,7 @@ public class CamomileClientJava {
      */
     public ArrayList<Media> getAllMedia() throws Exception {
         ArrayList<Media> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/media").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Media(jsa.getJSONObject(i)));
         }
@@ -378,7 +377,7 @@ public class CamomileClientJava {
      */
     public ArrayList<Media> getAllMediaFromcorpus(Corpus corpus) throws Exception {
         ArrayList<Media> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/media/" + corpus.getId() + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/corpus/" + corpus.getId() + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Media(jsa.getJSONObject(i)));
         }
@@ -395,7 +394,7 @@ public class CamomileClientJava {
      */
     public ArrayList<Media> getAllMediaFromIdcorpus(String idcorpus) throws Exception {
         ArrayList<Media> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/media/" + idcorpus + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/corpus/" + idcorpus + "/medium").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Media(jsa.getJSONObject(i)));
         }
@@ -473,18 +472,6 @@ public class CamomileClientJava {
     }
 
     /**
-     * Delete a Layer the corresponding to the idLayer
-     *
-     * @param idLayer _id of the Layer that will be deleted
-     * @return boolean; true : Layer deleted
-     * @throws Exception If failed, an exception is throwed with the error
-     * message from the server
-     */
-    public boolean deleteLayer(String idLayer) throws Exception {
-        return new Delete("/layer", idLayer).execute().isNull("success");
-    }
-
-    /**
      * Get all the Layer from the server
      *
      * @return ArrayList of all the Layer on the server
@@ -510,7 +497,7 @@ public class CamomileClientJava {
      */
     public ArrayList<Layer> getAllLayerFromCorpus(Corpus corpus) throws Exception {
         ArrayList<Layer> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/layer/" + corpus.getId() + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/corpus/" + corpus.getId() + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Layer(jsa.getJSONObject(i)));
         }
@@ -527,7 +514,7 @@ public class CamomileClientJava {
      */
     public ArrayList<Layer> getAllLayerFromIdCorpus(String idCorpus) throws Exception {
         ArrayList<Layer> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/layer/" + idCorpus + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/corpus/" + idCorpus + "/layer").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Layer(jsa.getJSONObject(i)));
         }
@@ -547,6 +534,30 @@ public class CamomileClientJava {
     }
 
     /**
+     * Delete a Layer the corresponding to the idLayer
+     *
+     * @param idLayer _id of the Layer that will be deleted
+     * @return boolean; true : Layer deleted
+     * @throws Exception If failed, an exception is throwed with the error
+     * message from the server
+     */
+    public boolean deleteLayer(String idLayer) throws Exception {
+        return new Delete("/layer", idLayer).execute().isNull("success");
+    }
+
+    /**
+     * Delete a Layer corresponding by it Java object
+     *
+     * @param layer the Layer that will be deleted
+     * @return boolean; true : Layer deleted
+     * @throws Exception If failed, an exception is throwed with the error
+     * message from the server
+     */
+    public boolean deleteLayer(Layer layer) throws Exception {
+        return new Delete("/layer", layer.getId()).execute().isNull("success");
+    }
+
+    /**
      * Update a layer on the server by it Java object
      *
      * @param layer Layer to be updated
@@ -555,7 +566,7 @@ public class CamomileClientJava {
      * message from the server
      */
     public Layer updateLayer(Layer layer) throws Exception {
-        return new Layer(new Post("/layer/" + layer.getId(), layer.toArgs()).execute());
+        return new Layer(new Put("/layer/" + layer.getId(), layer.toArgs()).execute());
     }
 
     /////////////////////////////////
@@ -575,7 +586,7 @@ public class CamomileClientJava {
         if (annotation.getIdLayer().isEmpty()) {
             throw new CamomileClientException("The id_layer attribute is empty");
         }
-        return new Annotation(new Post("Layer/" + annotation.getIdLayer() + "/annotation", annotation.toArgs()).execute());
+        return new Annotation(new Post("/Layer/" + annotation.getIdLayer() + "/annotation", annotation.toArgs()).execute());
     }
 
     /**
@@ -590,7 +601,7 @@ public class CamomileClientJava {
      *
      */
     public Annotation createAnnotation(Annotation annotation, String idLayer) throws Exception {
-        return new Annotation(new Post("Layer/" + idLayer + "/annotation", annotation.toArgs()).execute());
+        return new Annotation(new Post("/Layer/" + idLayer + "/annotation", annotation.toArgs()).execute());
     }
 
     /**
@@ -605,7 +616,7 @@ public class CamomileClientJava {
      *
      */
     public Annotation createAnnotation(Annotation annotation, Layer layer) throws Exception {
-        return new Annotation(new Post("Layer/" + layer.getId() + "/annotation", annotation.toArgs()).execute());
+        return new Annotation(new Post("/Layer/" + layer.getId() + "/annotation", annotation.toArgs()).execute());
     }
 
     /**
@@ -658,7 +669,7 @@ public class CamomileClientJava {
      */
     public ArrayList<Annotation> getAllAnnotationFromLayer(Layer layer) throws Exception {
         ArrayList<Annotation> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/annotation/" + layer.getId() + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/layer/" + layer.getId() + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Annotation(jsa.getJSONObject(i)));
         }
@@ -676,7 +687,7 @@ public class CamomileClientJava {
      */
     public ArrayList<Annotation> getAllAnnotationFromidLayer(String idLayer) throws Exception {
         ArrayList<Annotation> ret = new ArrayList<>();
-        JSONArray jsa = new Get("/annotation/" + idLayer + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
+        JSONArray jsa = new Get("/layer/" + idLayer + "/annotation").execute().getJSONArray("array").getJSONArray(0); //PAS compris le .getJSONArray(0) à la fin
         for (int i = 0; i < jsa.length(); i++) {
             ret.add(new Annotation(jsa.getJSONObject(i)));
         }
@@ -706,5 +717,5 @@ public class CamomileClientJava {
     public Annotation updateAnnotation(Annotation annotation) throws Exception {
         return new Annotation(new Put("/annotation/" + annotation.getId(), annotation.toArgs()).execute());
     }
-    
+
 }

@@ -100,6 +100,7 @@ public class Layer extends Resource {
         this.fragment_type = fragment_type;
         this.data_type = data_type;
     }
+    
 
     /**
      * Constructor for User, usually used with a JSON's response of the server
@@ -111,7 +112,7 @@ public class Layer extends Resource {
         this.idCorpus = jso.getString("id_corpus");
         this.name = jso.getString("name");
         this.fragment_type = jso.getJSONObject("fragment_type");
-        this.data_type = jso.getJSONObject("deta_type");
+        this.data_type = jso.getJSONObject("data_type");
     }
 
     public String getId() {
@@ -137,5 +138,23 @@ public class Layer extends Resource {
     public JSONObject getData_type() {
         return data_type;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(JSONObject description) {
+        this.description = description;
+    }
+
+    public void setFragment_type(JSONObject fragment_type) {
+        this.fragment_type = fragment_type;
+    }
+
+    public void setData_type(JSONObject data_type) {
+        this.data_type = data_type;
+    }
+    
+    
 
 }

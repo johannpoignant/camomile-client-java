@@ -20,37 +20,44 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-*/
+ */
+package camomile.client.java;
 
-package connection;
+import model.Corpus;
+import model.Login;
+import org.json.JSONObject;
 
 /**
- * Delete request, usually for delete
  *
  * @author mathias
  */
-public class Delete extends Http {
+public class testCorpus {
 
     /**
-     * Delete request of the Object corresponding to the targerID and of type
-     * objectType
-     *
-     * @param objectType type of the object (user, annotation, corpus,...)
-     * @param targetId _id of the object to be deleted
+     * @param args the command line arguments
      */
-    public Delete(String objectType, String targetId) {
-        super(objectType + "/" + targetId);
-        this.requestMethod = "DELETE";
-    }
+    public static void main(String[] args) {
+        try {
+            CamomileClientJava camomile = new CamomileClientJava("http://localhost:3000");
+            camomile.login(new Login("root", "admin"));
 
-    /**
-     * Delete request of the Object contained if the path String
-     *
-     * @param path String with the object type and it _id 
-     */
-    public Delete(String path) {
-        super(path);
-        this.requestMethod = "GET";
-    }
+            Corpus corpus = new Corpus("corpus20", new JSONObject("{\"testDescriptionUpdate\":\"vide\"}"));
 
+            corpus = camomile.createCorpus(corpus);
+
+            corpus.setDescription(new JSONObject("{\"testDescriptionUpdate\":\"Réussite\"}"));
+
+            camomile.updateCorpus(corpus);
+
+            camomile.getAllCorpus();
+
+            camomile.deleteCorpus(corpus);
+
+            camomile.logout();
+        } catch (Exception ex) {
+            System.err.println("\t" + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+    
 }

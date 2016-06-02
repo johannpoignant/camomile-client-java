@@ -715,7 +715,8 @@ public class CamomileClientJava {
      * message from the server
      */
     public Annotation updateAnnotation(Annotation annotation) throws Exception {
-        return new Annotation(new Put("/annotation/" + annotation.getId(), annotation.toArgs()).execute());
+        new Put("/annotation/" + annotation.getId(), annotation.toArgs()).execute();
+        return new Annotation(new Get("/annotation/"+ annotation.getId()).execute());
     }
 
 }
